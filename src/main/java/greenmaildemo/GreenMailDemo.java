@@ -12,6 +12,7 @@ import java.io.IOException;
 import java.util.Properties;
 
 
+@SuppressWarnings("CallToPrintStackTrace")
 public class GreenMailDemo
 {
     static GreenMail greenMail;
@@ -32,6 +33,8 @@ public class GreenMailDemo
 
             sendMail("Test1");
             sendMail("Test2");
+            sendMailWithSmtp("Test3");
+            sendMailWithSmtp("Test4");
 
             checkMailByObject();
             checkMailByImap();
@@ -138,7 +141,7 @@ public class GreenMailDemo
 
     static void sendMail(String subject)
     {
-        // Create properties for SMTP
+        // Create properties
         Properties props = new Properties();
         props.setProperty("mail.smtp.host", HOST);
         props.setProperty("mail.smtp.port", "3025");
@@ -162,4 +165,32 @@ public class GreenMailDemo
             e.printStackTrace();
         }
     }
+
+    static void sendMailWithSmtp(String subject)
+    {
+        // Create properties for SMTP
+        Properties props = new Properties();
+        props.setProperty("mail.smtp.host", HOST);
+        props.setProperty("mail.smtp.port", "3025");
+
+        // Create session
+        Session session = Session.getInstance(props, null);
+
+        try {
+            // Create message
+            MimeMessage message = new MimeMessage(session);
+            message.setFrom(new InternetAddress(EMAIL_USER_ADDRESS));
+            message.addRecipient(Message.RecipientType.TO, new InternetAddress(EMAIL_USER_ADDRESS));
+            message.setSubject(subject);
+            message.setText("This is a test content.");
+
+            // send with SMTP
+            Transport.send(message);
+            System.out.println("Email Message Sent Successfully");
+        }
+        catch (MessagingException e) {
+            e.printStackTrace();
+        }
+    }
+
 }
